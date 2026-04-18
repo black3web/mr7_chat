@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../../providers/app_provider.dart';
 import '../../config/theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -307,7 +306,8 @@ class _AiServicesTabState extends State<_AiServicesTab> {
   Map<String, bool> _states = {};
   bool _loading = true;
 
-  final _serviceNames = {
+  final Map<String, String> _serviceNames = AppConstants.aiServiceNames;
+  // old map removed
     'gemini': 'Gemini 2.5 Flash',
     'deepseek': 'DeepSeek AI',
     'imageGen': 'Nano Banana 2',
