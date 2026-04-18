@@ -16,7 +16,6 @@ class AiService {
   static const String _nanoBananaProUrl = 'https://zecora0.serv00.net/ai/NanoBanana.php';
   static const String _seedanceUrl = 'https://zecora0.serv00.net/ai/Seedance.php';
 
-  // Available Seedance models
   static const List<Map<String, dynamic>> seedanceModels = [
     {
       'id': 'Seedance 1.5 Pro',
@@ -78,7 +77,7 @@ class AiService {
     } catch (_) {}
   }
 
-  // Gemini Chat
+  // --- Gemini Chat ---
   Future<String> geminiChat(String message, String userId) async {
     if (!await _isServiceEnabled('gemini')) throw Exception('الخدمة غير متاحة حاليا');
     try {
@@ -100,7 +99,7 @@ class AiService {
     }
   }
 
-  // DeepSeek Chat
+  // --- DeepSeek Chat ---
   Future<Map<String, dynamic>> deepSeekChat(String message, String userId, {String model = '1', String? conversationId}) async {
     if (!await _isServiceEnabled('deepseek')) throw Exception('الخدمة غير متاحة حاليا');
     try {
@@ -122,7 +121,7 @@ class AiService {
     }
   }
 
-  // Generate image with Nano Banana 2
+  // --- Image Generation (Nano Banana 2) ---
   Future<String> generateImageNano(String prompt, String userId) async {
     if (!await _isServiceEnabled('imageGen')) throw Exception('الخدمة غير متاحة حاليا');
     try {
@@ -144,7 +143,18 @@ class AiService {
     }
   }
 
-  // NanoBanana Pro - create or edit image
+  // --- Upscale Image (Required by image_gen_screen.dart) ---
+  Future<String> upscaleImage(String imagePath, {String userId = 'system'}) async {
+    // نستخدم محرك NanoBanana Pro للقيام بعملية التحسين (Upscale)
+    return await nanoBananaPro(
+      prompt: "Upscale and enhance this image",
+      userId: userId,
+      resolution: "4K",
+      imageUrl: imagePath,
+    );
+  }
+
+  // --- NanoBanana Pro ---
   Future<String> nanoBananaPro({
     required String prompt,
     required String userId,
@@ -181,7 +191,13 @@ class AiService {
     }
   }
 
-  // Video generation with Kilwa API
+  // --- Generate Video (Generic method for video_gen_screen.dart) ---
+  Future<String> generateVideo(String prompt, {String userId = 'system'}) async {
+    // نستخدم Kilwa كخيار افتراضي لتوليد الفيديو السريع
+    return await generateVideoKilwa(prompt, userId);
+  }
+
+  // --- Video generation with Kilwa API ---
   Future<String> generateVideoKilwa(String prompt, String userId) async {
     if (!await _isServiceEnabled('videoGen')) throw Exception('الخدمة غير متاحة حاليا');
     try {
@@ -203,7 +219,7 @@ class AiService {
     }
   }
 
-  // Seedance Video Generation (text-to-video or image-to-video)
+  // --- Seedance Video Generation ---
   Future<String> seedanceGenerate({
     required String prompt,
     required String userId,
@@ -248,12 +264,10 @@ class AiService {
     }
   }
 
-  // Toggle a service on/off
   Future<void> toggleService(String service, bool enabled) async {
     await _db.collection('settings').doc('ai_services').set({service: enabled}, SetOptions(merge: true));
   }
 
-  // Get service enabled states
   Future<Map<String, bool>> getServiceStates() async {
     try {
       final doc = await _db.collection('settings').doc('ai_services').get();
