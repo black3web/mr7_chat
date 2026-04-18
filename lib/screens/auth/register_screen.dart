@@ -90,10 +90,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _nameCtrl,
                       style: const TextStyle(color: AppColors.textPrimary),
                       decoration: InputDecoration(hintText: l['namePlaceholder'], prefixIcon: const Icon(Icons.person_outline_rounded, size: 20)),
-                      maxLength: AppConstants.maxNameLength,
+                      maxLength: AppConstants.maxNameLen,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) return l['nameRequired'];
-                        if (v.length > AppConstants.maxNameLength) return l['nameTooLong'];
+                        if (v.length > AppConstants.maxNameLen) return l['nameTooLong'];
                         return null;
                       },
                     ),
@@ -104,7 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _userCtrl,
                       style: const TextStyle(color: AppColors.textPrimary),
                       onChanged: (v) {
-                        if (RegExp(AppConstants.usernameRegex).hasMatch(v) && v.length >= 4) _checkUsername(v);
+                        if (RegExp(AppConstants.usernamePattern).hasMatch(v) && v.length >= 4) _checkUsername(v);
                         else setState(() => _userAvailable = null);
                       },
                       decoration: InputDecoration(
@@ -116,12 +116,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               : Icon(_userAvailable! ? Icons.check_circle_rounded : Icons.cancel_rounded,
                                   color: _userAvailable! ? AppColors.online : AppColors.accent, size: 20),
                       ),
-                      maxLength: AppConstants.maxUsernameLength,
+                      maxLength: AppConstants.maxUsernameLen,
                       validator: (v) {
                         if (v == null || v.isEmpty) return l['usernameRequired'];
-                        if (v.length < AppConstants.minUsernameLength) return l['usernameTooShort'];
-                        if (v.length > AppConstants.maxUsernameLength) return l['usernameTooLong'];
-                        if (!RegExp(AppConstants.usernameRegex).hasMatch(v)) return l['usernameInvalid'];
+                        if (v.length < AppConstants.minUsernameLen) return l['usernameTooShort'];
+                        if (v.length > AppConstants.maxUsernameLen) return l['usernameTooLong'];
+                        if (!RegExp(AppConstants.usernamePattern).hasMatch(v)) return l['usernameInvalid'];
                         if (_userAvailable == false) return l['usernameTaken'];
                         return null;
                       },
@@ -141,10 +141,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () => setState(() => _showPass = !_showPass),
                         ),
                       ),
-                      maxLength: AppConstants.maxPasswordLength,
+                      maxLength: AppConstants.maxPasswordLen,
                       validator: (v) {
                         if (v == null || v.isEmpty) return l['passwordRequired'];
-                        if (v.length < AppConstants.minPasswordLength) return l['passwordTooShort'];
+                        if (v.length < AppConstants.minPasswordLen) return l['passwordTooShort'];
                         return null;
                       },
                     ),
