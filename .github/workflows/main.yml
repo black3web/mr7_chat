@@ -1,39 +1,49 @@
-name: Build and Deploy MR7-Chat
+name: MR7-Chat Build & Deploy
 
 on:
   push:
     branches:
-      - main # أو master حسب اسم الفرع عندك
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install Flutter
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.19.0'
           channel: 'stable'
-          
-      - name: Get Dependencies
+
+      - name: Install Dependencies
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release
+        run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
 
-      - name: Build APK
+      - name: Build Android APK
         run: flutter build apk --release
 
       - name: Upload APK
-* uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Deploy to GitHub Pages (Web)
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
-
