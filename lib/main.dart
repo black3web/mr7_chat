@@ -12,19 +12,41 @@ import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize developer account
   await AuthService().initDevAccount();
+
+  // Lock orientation
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Color(0xFF0A0A0A),
+    systemNavigationBarIconBrightness: Brightness.light,
   ));
+
   final provider = AppProvider();
   await provider.init();
-  runApp(ChangeNotifierProvider.value(value: provider, child: const MR7App()));
+
+  runApp(
+    ChangeNotifierProvider.value(
+      value: provider,
+      child: const MR7App(),
+    ),
+  );
 }
 
 class MR7App extends StatelessWidget {
   const MR7App({super.key});
+
   @override
   Widget build(BuildContext context) {
     final p = context.watch<AppProvider>();
@@ -46,8 +68,10 @@ class MR7App extends StatelessWidget {
       routes: AppRoutes.routes,
       onGenerateRoute: AppRoutes.generateRoute,
       builder: (context, child) {
+        // Apply RTL/LTR globally based on language
         return Directionality(
-          textDirection: p.language == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+          textDirection:
+              p.language == 'ar' ? TextDirection.rtl : TextDirection.ltr,
           child: child!,
         );
       },
