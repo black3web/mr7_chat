@@ -11,8 +11,7 @@ import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/user_profile_screen.dart';
 import '../screens/stories/story_view_screen.dart';
 import '../screens/stories/add_story_screen.dart';
-import '../screens/ai/gemini_chat_screen.dart';
-import '../screens/ai/deepseek_chat_screen.dart';
+import '../screens/ai/gemini_chat_screen.dart'; // هذا الملف أصبح يحتوي على شاشتي Gemini و DeepSeek
 import '../screens/ai/image_gen_screen.dart';
 import '../screens/ai/video_gen_screen.dart';
 import '../screens/settings/settings_screen.dart';
@@ -56,7 +55,7 @@ class AppRoutes {
     admin: (_) => const AdminScreen(),
     search: (_) => const SearchScreen(),
     geminiChat: (_) => const GeminiChatScreen(),
-    deepSeekChat: (_) => const DeepSeekChatScreen(),
+    deepSeekChat: (_) => const DeepSeekChatScreen(), // تم ربطها بنجاح الآن
     imageGen: (_) => const ImageGenScreen(),
     imageGenPro: (_) => const ImageGenScreen(),
     videoGen: (_) => const VideoGenScreen(),
