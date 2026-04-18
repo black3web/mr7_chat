@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D0005;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#1A0008;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0A0A0A;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B0000;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#FF1744;stop-opacity:0.2"/>
+    </linearGradient>
+    <radialGradient id="rGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#8B0000;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#5C0000;stop-opacity:1"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#FF174450"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bgGrad)"/>
+
+  <!-- Subtle glow circle -->
+  <circle cx="512" cy="512" r="380" fill="url(#glowGrad)" opacity="0.5"/>
+
+  <!-- Border ring -->
+  <rect x="20" y="20" width="984" height="984" rx="205"
+    fill="none" stroke="#8B0000" stroke-width="3" opacity="0.6"/>
+
+  <!-- Letter M - white, bold -->
+  <text
+    x="155" y="680"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-size="520"
+    font-weight="900"
+    fill="#FFFFFF"
+    filter="url(#shadow)"
+    letter-spacing="-10">M</text>
+
+  <!-- Letter R - dark red gradient -->
+  <text
+    x="490" y="680"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-size="520"
+    font-weight="900"
+    fill="url(#rGrad)"
+    filter="url(#glow)"
+    letter-spacing="-10">R</text>
+
+  <!-- Number 7 - superscript, accent color -->
+  <text
+    x="855" y="380"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-size="220"
+    font-weight="900"
+    fill="#FF1744"
+    filter="url(#glow)"
+    opacity="0.95">7</text>
+
+  <!-- Decorative accent line -->
+  <line x1="120" y1="750" x2="904" y2="750"
+    stroke="#8B0000" stroke-width="4" opacity="0.4"/>
+</svg>
