@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="MR7 Chat - Advanced Chat and AI Platform">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="msapplication-navbutton-color" content="#0A0A0A">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>MR7 Chat</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: #0A0A0A;
+      overflow: hidden;
+    }
+    #splash {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, #5C000030 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 80%, #3A000020 0%, transparent 60%),
+                  linear-gradient(160deg, #0D0005 0%, #0A0A0A 50%, #0D0005 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    #splash .logo {
+      font-size: 56px; font-weight: 900; letter-spacing: 6px;
+      background: linear-gradient(135deg, #FF6B6B, #8B0000, #FF1744, #fff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: none;
+      font-family: 'Arial Black', Arial, sans-serif;
+      filter: drop-shadow(0 0 20px rgba(139,0,0,0.5));
+    }
+    #splash .sub {
+      font-size: 11px; letter-spacing: 8px; margin-top: 10px;
+      color: rgba(255,255,255,0.3); font-family: Arial, sans-serif;
+      text-transform: uppercase;
+    }
+    .spinner {
+      width: 32px; height: 32px; margin-top: 40px;
+      border: 2px solid rgba(255,23,68,0.2);
+      border-top: 2px solid #FF1744;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <div class="logo">MR7</div>
+    <div class="sub">Chat</div>
+    <div class="spinner"></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      var splash = document.getElementById('splash');
+      if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 500); }
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
