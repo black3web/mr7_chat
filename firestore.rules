@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.auth.uid == userId;
+      allow update: if isUser(userId) || isAdmin();
+      allow delete: if isUser(userId) || isAdmin();
+    }
+
+    // Chats collection
+    match /chats/{chatId} {
+      allow read, write: if isAuth() &&
+        (resource == null || request.auth.uid in resource.data.participantIds);
+
+      match /messages/{messageId} {
+        allow read: if isAuth();
+        allow create: if isAuth();
+        allow update, delete: if isAuth() &&
+          (resource.data.senderId == request.auth.uid || isAdmin());
+      }
+    }
+
+    // Groups collection
+    match /groups/{groupId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAuth();
+        allow create: if isAuth();
+        allow update, delete: if isAuth() &&
+          (resource.data.senderId == request.auth.uid || isAdmin());
+      }
+    }
+
+    // Stories
+    match /stories/{storyId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuth() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // AI Logs - admin only read
+    match /ai_logs/{logId} {
+      allow create: if isAuth();
+      allow read: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Support
+    match /support/{threadId} {
+      allow create: if isAuth();
+      allow read, update: if isAuth() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+
+      match /replies/{replyId} {
+        allow read: if isAuth();
+        allow create: if isAuth();
+      }
+    }
+
+    // Broadcasts - admin write, all read
+    match /broadcasts/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // Notifications
+    match /notifications/{id} {
+      allow read: if isAuth() &&
+        resource.data.targetUserId == request.auth.uid;
+      allow write: if isAdmin();
+    }
+
+    // Settings - admin only
+    match /settings/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+  }
+}
