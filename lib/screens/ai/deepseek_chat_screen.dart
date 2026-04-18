@@ -19,70 +19,86 @@ class _DeepSeekChatScreenState extends State<DeepSeekChatScreen> {
   String _model = '1';
   String? _conversationId;
 
-  static const _modelNames = {'1': 'DeepSeek V3.2', '2': 'DeepSeek R1', '3': 'DeepSeek Coder'};
+  static const _modelNames = {
+    '1': 'DeepSeek V3.2',
+    '2': 'DeepSeek R1',
+    '3': 'DeepSeek Coder'
+  };
 
   @override
   void initState() {
     super.initState();
-    _addBotMsg('مرحبا! انا DeepSeek. اختر النموذج المناسب واسالني ما تريد.');
+    _addBotMsg('مرحباً! أنا DeepSeek. اختر النموذج المناسب واسألني ما تريد.');
   }
 
   void _addBotMsg(String text, {bool isError = false}) {
-    _messages.insert(0, _AiMsg(text: text, isUser: false, time: DateTime.now(), isError: isError));
+    setState(() {
+      _messages.insert(0, _AiMsg(text: text, isUser: false, time: DateTime.now(), isError: isError));
+    });
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() { 
+    _ctrl.dispose(); 
+    super.dispose(); 
+  }
 
   Future<void> _send() async {
     final text = _ctrl.text.trim();
     if (text.isEmpty || _loading) return;
-    final userId = context.read<AppProvider>().currentUser?.id ?? '';
-    _ctrl.clear();
-    setState(() { _messages.insert(0, _AiMsg(text: text, isUser: true, time: DateTime.now())); _loading = true; });
-    try {
-      final result = await AiService().deepSeekChat(text, userId, model: _model, conversationId: _conversationId);
-      _conversationId = result['conversation_id'] as String?;
-      setState(() => _addBotMsg(result['response'] as String));
-    } catch (e) {
-      setState(() => _addBotMsg('حدث خطأ. حاول مجددا.', isError: true));
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
 
-  void _changeModel(String key) {
     setState(() {
-      _model = key;
-      _conversationId = null;
-      _messages.clear();
-      _addBotMsg('تم التبديل الى ${_modelNames[key]}. ابدا محادثة جديدة.');
+      _messages.insert(0, _AiMsg(text: text, isUser: true, time: DateTime.now()));
+      _loading = true;
     });
+    _ctrl.clear();
+
+    try {
+      final res = await AiService().chatWithDeepSeek(text, model: _model, conversationId: _conversationId);
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _addBotMsg(res['text']);
+          _conversationId = res['conversationId'];
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _addBotMsg('عذراً، حدث خطأ في الاتصال بالخادم.', isError: true);
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final me = context.read<AppProvider>().currentUser;
+
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.bg,
       body: Container(
-        decoration: const BoxDecoration(gradient: AppGradients.backgroundGradient),
+        decoration: BoxDecoration(gradient: AppGradients.mainGradient),
         child: SafeArea(child: Column(children: [
-          _AiHeader(title: 'DeepSeek AI', subtitle: _modelNames[_model] ?? 'DeepSeek', color: const Color(0xFF00BCD4), icon: Icons.auto_awesome_rounded),
+          _AiHeader(title: 'DeepSeek AI', onBack: () => Navigator.pop(context)),
+          
+          // Model Selector
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(children: _modelNames.entries.map((e) => Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
-                onTap: () => _changeModel(e.key),
+              child: InkWell(
+                onTap: () => setState(() => _model = e.key),
+                borderRadius: BorderRadius.circular(20),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     gradient: _model == e.key ? AppGradients.accentGradient : null,
-                    color: _model == e.key ? null : AppColors.bgLight,
+                    color: _model == e.key ? null : AppColors.bgCard,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: _model == e.key ? AppColors.accent : AppColors.glassBorder),
                   ),
@@ -91,6 +107,7 @@ class _DeepSeekChatScreenState extends State<DeepSeekChatScreen> {
               ),
             )).toList()),
           ),
+          
           Expanded(
             child: ListView.builder(
               reverse: true,
@@ -103,9 +120,123 @@ class _DeepSeekChatScreenState extends State<DeepSeekChatScreen> {
               },
             ),
           ),
-          _AiInputBar(ctrl: _ctrl, onSend: _send, loading: _loading, hint: l['sendPrompt']),
+          _AiInputBar(ctrl: _ctrl, onSend: _send, loading: _loading, hint: 'اسأل DeepSeek...'),
         ])),
       ),
+    );
+  }
+}
+
+// الأجزاء المفقودة التي تم إضافتها لإصلاح الأخطاء
+class _AiMsg {
+  final String text;
+  final bool isUser;
+  final DateTime time;
+  final bool isError;
+  _AiMsg({required this.text, required this.isUser, required this.time, this.isError = false});
+}
+
+class _AiHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onBack;
+  const _AiHeader({required this.title, required this.onBack});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(children: [
+        IconButton(onPressed: onBack, icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white)),
+        Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+      ]),
+    );
+  }
+}
+
+class _AiMessageBubble extends StatelessWidget {
+  final _AiMsg msg;
+  final String? userPhotoUrl;
+  final String userName;
+  const _AiMessageBubble({required this.msg, this.userPhotoUrl, required this.userName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: msg.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!msg.isUser) _buildAvatar(),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: msg.isUser ? AppColors.accent.withOpacity(0.2) : AppColors.bgCard,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: msg.isError ? Colors.red : AppColors.glassBorder),
+              ),
+              child: Text(msg.text, style: const TextStyle(color: Colors.white, fontSize: 14)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (msg.isUser) _buildAvatar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: AppColors.bgCard,
+      backgroundImage: userPhotoUrl != null ? NetworkImage(userPhotoUrl!) : null,
+      child: userPhotoUrl == null ? const Icon(Icons.person, size: 18, color: Colors.white) : null,
+    );
+  }
+}
+
+class _AiInputBar extends StatelessWidget {
+  final TextEditingController ctrl;
+  final VoidCallback onSend;
+  final bool loading;
+  final String hint;
+  const _AiInputBar({required this.ctrl, required this.onSend, required this.loading, required this.hint});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: const BoxDecoration(color: AppColors.bg, border: Border(top: BorderSide(color: AppColors.glassBorder))),
+      child: Row(children: [
+        Expanded(
+          child: TextField(
+            controller: ctrl,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(color: AppColors.textSecondary),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+        IconButton(
+          onPressed: loading ? null : onSend,
+          icon: loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.send_rounded, color: AppColors.accent),
+        ),
+      ]),
+    );
+  }
+}
+
+class _TypingIndicator extends StatelessWidget {
+  const _TypingIndicator();
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Text('DeepSeek يكتب الآن...', style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontStyle: FontStyle.italic)),
     );
   }
 }
