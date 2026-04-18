@@ -95,7 +95,7 @@ class _SendSupportTabState extends State<_SendSupportTab> {
     final userName = context.read<AppProvider>().currentUser!.name;
     setState(() => _loading = true);
     try {
-      await FirebaseFirestore.instance.collection(AppConstants.supportCollection).add({
+      await FirebaseFirestore.instance.collection(AppConstants.colSupport).add({
         'userId': userId,
         'userName': userName,
         'message': _ctrl.text.trim(),
@@ -153,7 +153,7 @@ class _SupportThreadsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final userId = context.read<AppProvider>().currentUser!.id;
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection(AppConstants.supportCollection).where('userId', isEqualTo: userId).orderBy('createdAt', descending: true).snapshots(),
+      stream: FirebaseFirestore.instance.collection(AppConstants.colSupport).where('userId', isEqualTo: userId).orderBy('createdAt', descending: true).snapshots(),
       builder: (ctx, snap) {
         final docs = snap.data?.docs ?? [];
         if (docs.isEmpty) return const Center(child: Icon(Icons.support_agent_rounded, size: 56, color: AppColors.textMuted));
