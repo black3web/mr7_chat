@@ -103,9 +103,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ])),
               const SizedBox(height: 24),
               GlassContainer(padding: const EdgeInsets.all(16), child: Column(children: [
-                _Field(ctrl: _nameCtrl, label: l['name'], icon: Icons.person_rounded, max: AppConstants.maxNameLength),
+                _Field(ctrl: _nameCtrl, label: l['name'], icon: Icons.person_rounded, max: AppConstants.maxNameLen),
                 const SizedBox(height: 12),
-                _Field(ctrl: _userCtrl, label: l['username'], icon: Icons.alternate_email_rounded, prefix: '@', max: AppConstants.maxUsernameLength),
+                _Field(ctrl: _userCtrl, label: l['username'], icon: Icons.alternate_email_rounded, prefix: '@', max: AppConstants.maxUsernameLen),
                 const SizedBox(height: 12),
                 _Field(ctrl: _bioCtrl, label: 'Bio', icon: Icons.info_outline_rounded, maxLines: 3),
               ])),
