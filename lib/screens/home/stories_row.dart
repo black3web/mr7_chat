@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../config/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/story_service.dart';
+import '../../models/user_model.dart';
 import '../../models/story_model.dart';
 import '../../widgets/user_avatar.dart';
 
@@ -51,7 +52,7 @@ class StoriesRow extends StatelessWidget {
 }
 
 class _MyStoryItem extends StatelessWidget {
-  final dynamic user;
+  final UserModel user;
   const _MyStoryItem({required this.user});
   @override
   Widget build(BuildContext context) => GestureDetector(
